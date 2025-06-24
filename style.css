@@ -43,3 +43,19 @@ button:disabled {
     font-weight: bold;
     min-height: 20px;
 }
+
+.options {
+    margin: 15px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 30px;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.options div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

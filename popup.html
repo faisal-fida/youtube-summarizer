@@ -1,14 +1,30 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>YT Transcript Copier</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <h1>Transcript Copier</h1>
-    <p>Click the button to copy the video's transcript.</p>
+    <p>Select your format and click the button to copy.</p>
+
+    <div class="options">
+      <div>
+        <input
+          type="checkbox"
+          id="includeTimestamps"
+          name="includeTimestamps"
+        />
+        <label for="includeTimestamps">Include Timestamps</label>
+      </div>
+      <div>
+        <input type="checkbox" id="formatMarkdown" name="formatMarkdown" />
+        <label for="formatMarkdown">Format as Markdown</label>
+      </div>
+    </div>
+
     <button id="copyButton">Copy Transcript</button>
     <p id="status"></p>
     <script src="popup.js"></script>
-</body>
+  </body>
 </html>

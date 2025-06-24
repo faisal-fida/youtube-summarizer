@@ -1,11 +1,16 @@
-// popup.js (Updated with formatting logic)
+// popup.js (Updated for Feature 2: Custom UI)
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Get all UI elements
     const copyButton = document.getElementById('copyButton');
+    const copyRawButton = document.getElementById('copyRawButton');
     const statusEl = document.getElementById('status');
+    const charCountEl = document.getElementById('charCount');
+    const promptTextarea = document.getElementById('promptTextarea');
     const includeTimestampsCheck = document.getElementById('includeTimestamps');
     const formatMarkdownCheck = document.getElementById('formatMarkdown');
 
+    // Formatter function (from Feature 1)
     const formatTranscript = (transcriptData, options) => {
         let formattedText = "";
         transcriptData.forEach(item => {
@@ -21,56 +26,81 @@ document.addEventListener('DOMContentLoaded', () => {
                     line += `[${item.timestamp}] `;
                 }
                 line += item.text;
-                // In markdown, we can add a newline for each segment. In plain text, a space is better.
                 formattedText += line + (options.formatMarkdown ? '\n' : ' ');
             }
         });
         return formattedText.trim();
     };
-
-    copyButton.addEventListener('click', async () => {
-        statusEl.textContent = 'Working...';
-        copyButton.disabled = true;
+    
+    // Shared function to fetch and process the transcript
+    const getAndProcessTranscript = async () => {
+        setUiState(true, 'Working...'); // Disable UI, show status
 
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
         if (!tab.url || !tab.url.includes("youtube.com/watch")) {
-            statusEl.textContent = 'Error: Not a YouTube video page.';
-            copyButton.disabled = false;
-            return;
+            throw new Error("Not a YouTube video page.");
         }
 
-        chrome.scripting.executeScript({
+        const injectionResults = await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             files: ['content.js']
-        }, (injectionResults) => {
-            if (chrome.runtime.lastError || !injectionResults || !injectionResults.length) {
-                statusEl.textContent = 'Error: Failed to inject script.';
-                copyButton.disabled = false; return;
-            }
-
-            const { result } = injectionResults[0];
-
-            if (result.error) {
-                statusEl.textContent = `Error: ${result.error}`;
-                copyButton.disabled = false;
-            } else {
-                const options = {
-                    includeTimestamps: includeTimestampsCheck.checked,
-                    formatMarkdown: formatMarkdownCheck.checked
-                };
-                
-                const transcriptText = formatTranscript(result.data, options);
-                const finalText = `Summarize this: \n\n${transcriptText}`;
-
-                navigator.clipboard.writeText(finalText).then(() => {
-                    statusEl.textContent = 'Transcript copied to clipboard!';
-                    setTimeout(() => { window.close(); }, 2000);
-                }).catch(err => {
-                    statusEl.textContent = 'Error: Could not copy text.';
-                    console.error('Clipboard write failed: ', err);
-                });
-            }
         });
+
+        if (chrome.runtime.lastError || !injectionResults || !injectionResults.length) {
+            throw new Error("Failed to inject script.");
+        }
+
+        const { result } = injectionResults[0];
+        if (result.error) {
+            throw new Error(result.error);
+        }
+
+        const options = {
+            includeTimestamps: includeTimestampsCheck.checked,
+            formatMarkdown: formatMarkdownCheck.checked
+        };
+        
+        const transcriptText = formatTranscript(result.data, options);
+        charCountEl.textContent = `${transcriptText.length} characters`;
+        return transcriptText;
+    };
+
+    // Main "Copy with Prompt" button logic
+    copyButton.addEventListener('click', async () => {
+        try {
+            const transcriptText = await getAndProcessTranscript();
+            const prefix = promptTextarea.value;
+            const finalText = `${prefix}\n\n${transcriptText}`;
+            
+            await navigator.clipboard.writeText(finalText);
+            setUiState(true, 'Copied with prompt!');
+            setTimeout(() => window.close(), 2000);
+        } catch (error) {
+            setUiState(false, `Error: ${error.message}`);
+        }
     });
+
+    // "Copy Raw" button logic
+    copyRawButton.addEventListener('click', async () => {
+        try {
+            const transcriptText = await getAndProcessTranscript();
+            // No prefix is added here
+            await navigator.clipboard.writeText(transcriptText);
+            setUiState(true, 'Raw transcript copied!');
+            setTimeout(() => window.close(), 2000);
+        } catch (error) {
+            setUiState(false, `Error: ${error.message}`);
+        }
+    });
+
+    // Helper to manage UI state
+    const setUiState = (isWorking, statusText) => {
+        copyButton.disabled = isWorking;
+        copyRawButton.disabled = isWorking;
+        statusEl.textContent = statusText;
+        if (!isWorking) {
+            charCountEl.textContent = ''; // Clear character count on error
+        }
+    };
 });

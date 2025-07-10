@@ -6,18 +6,6 @@
   "permissions": ["activeTab", "scripting", "clipboardWrite"],
   "host_permissions": ["*://*.youtube.com/*"],
   "action": {
-    "default_popup": "popup.html",
-    "default_icon": {
-      "16": "icons/icon16.jpeg",
-      "32": "icons/icon32.jpeg",
-      "48": "icons/icon48.jpeg",
-      "128": "icons/icon128.jpeg"
-    }
-  },
-  "icons": {
-    "16": "icons/icon16.jpeg",
-    "32": "icons/icon32.jpeg",
-    "48": "icons/icon48.jpeg",
-    "128": "icons/icon128.jpeg"
+    "default_popup": "popup\\popup.html"
   }
 }

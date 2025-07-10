@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Transcript Extractor",
+  "name": "YouTube Transcript Summarizer",
   "version": "1.0",
-  "description": "Extracts a YouTube video transcript with chapters, formats it.",
+  "description": "Extracts a YouTube video transcript with chapters, formats it, and summarizes it.",
   "permissions": ["activeTab", "scripting", "clipboardWrite"],
   "host_permissions": ["*://*.youtube.com/*"],
   "action": {

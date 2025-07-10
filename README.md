@@ -1,6 +1,6 @@
 # YouTube Transcript Summarizer
 
-A browser extension to extract and format transcripts from YouTube videos.
+A browser extension to extract and summarize transcripts from YouTube videos.
 
 ## Features
 
@@ -15,7 +15,6 @@ A browser extension to extract and format transcripts from YouTube videos.
 - Export transcript as `.pdf` or `.md`
 
 ## Extension is built with following key components:
-
 
 1.  **Popup (`popup/`)**: The user interface. When the user clicks the extension icon, `popup.html` is shown. `popup.js` then initiates the transcript extraction process.
 

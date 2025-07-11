@@ -3,15 +3,20 @@
   "name": "YouTube Transcript Summarizer",
   "version": "1.0",
   "description": "Extracts a YouTube video transcript with chapters, formats it, and summarizes it.",
-  "permissions": [
-    "activeTab",
-    "scripting",
-    "clipboardWrite",
-    "tabs",
-    "downloads"
-  ],
+  "permissions": ["activeTab", "scripting", "tabs", "windows", "downloads"],
   "host_permissions": ["*://*.youtube.com/*", "https://chat.deepseek.com/*"],
   "action": {
-    "default_popup": "popup\\popup.html"
+    "default_title": "YouTube Transcript Summarizer"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://chat.deepseek.com/*"],
+      "js": ["content-scripts/deepseek-download-button.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
   }
 }

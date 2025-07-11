@@ -1,6 +1,6 @@
 import { getTranscript } from "../features/transcript.js";
 import { summarizeTranscript } from "../features/summary.js";
-import { exportSummary } from "../features/export.js";
+import { exportToFile } from "../shared/utils.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   const transcriptContainer = document.getElementById("transcript");
@@ -19,12 +19,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Step 2: Summarize the transcript
       showMessage("Summarizing transcript...");
-      const summary = await summarizeTranscript(transcript);
-      transcriptContainer.textContent = summary;
+      const summaryResult = await summarizeTranscript(transcript);
+      transcriptContainer.textContent = summaryResult.summary;
 
       // Step 3: Export the summary
       showMessage("Exporting summary...");
-      await exportSummary(summary);
+      exportToFile(summaryResult.summary, summaryResult.filename);
+      showMessage("Summary exported successfully!");
     } catch (error) {
       showMessage(`An error occurred: ${error.message}`);
     }
